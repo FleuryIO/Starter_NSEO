@@ -1,34 +1,25 @@
-# Dependencies
+# Node
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Build output
+# Vite / Build
 dist/
-build/
+.vite/
 *.local
 
-# Environment
+# Env
 .env
-.env.local
 .env.*.local
 
-# Editor
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
+# Editor / OS
 .DS_Store
-Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
 
-# Logs
-logs/
-*.log
-npm-debug.log*
-
-# Testing
+# Coverage / tests
 coverage/
-
-# Backups (from bootstrap.sh)
-*.bak-*
