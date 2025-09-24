@@ -48,9 +48,15 @@ fi
 # ───────────── init Vite si nécessaire ─────────────
 if [ ! -f package.json ]; then
   log "⚡ Init Vite + React…"
-  npm create vite@latest . -- --template react
+  npm create vite@latest . -- --template react -y
 else
-  ok "package.json déjà présent — skip init."
+  # Vérifier que c'est bien un projet Vite React (présence de vite dans deps/scripts)
+  if ! grep -q '"vite"' package.json; then
+    warn "package.json trouvé mais 'vite' non détecté. Le dossier semble contenir un autre projet."
+    warn "→ Soit change de dossier, soit supprime/backup l’existant avant de relancer."
+  else
+    ok "package.json déjà présent — projet Vite détecté, skip init."
+  fi
 fi
 
 # ─────────────────── install ───────────────────────
@@ -63,8 +69,16 @@ else
 fi
 ok "Dépendances installées."
 
+# ─────────── log des versions clés ───────────
+node <<'NODE' || warn "Impossible d'afficher les versions installées."
+const fs = require("fs");
+const pkg = JSON.parse(fs.readFileSync("package.json","utf8"));
+const all = {...(pkg.dependencies||{}), ...(pkg.devDependencies||{})};
+const pick = n => all[n] || "n/a";
+console.log(`ℹ️  Versions → vite: ${pick("vite")} | react: ${pick("react")} | tailwindcss: ${pick("tailwindcss")} | @tailwindcss/postcss: ${pick("@tailwindcss/postcss")}`);
+NODE
+
 # ───── Tailwind v4 + PostCSS + Autoprefixer ────────
-# NOTE: Tailwind v4 requiert @tailwindcss/postcss comme plugin PostCSS
 log "🎨 Vérif Tailwind v4 + PostCSS + Autoprefixer…"
 npm i -D tailwindcss @tailwindcss/postcss postcss autoprefixer
 ok "Packages Tailwind/PostCSS présents."
@@ -75,34 +89,22 @@ if [ ! -f tailwind.config.js ]; then
   log "🛠  Tentative de génération tailwind.config.js / postcss.config.js…"
 
   success=0
-
-  # Méthode 1 : binaire local
   if [ -x "$TAILWIND_BIN" ]; then
     if "$TAILWIND_BIN" init -p >/dev/null 2>&1; then
-      success=1
-      ok "tailwindcss init via binaire local."
+      success=1; ok "tailwindcss init via binaire local."
     fi
   fi
-
-  # Méthode 2 : npm exec (npm 9/10+ ; note le --)
   if [ "$success" -eq 0 ]; then
     if npm exec -- tailwindcss init -p >/dev/null 2>&1; then
-      success=1
-      ok "tailwindcss init via npm exec."
+      success=1; ok "tailwindcss init via npm exec."
     fi
   fi
-
-  # Méthode 3 : npx (avec version explicite pour fiabilité)
   if [ "$success" -eq 0 ]; then
     if npx -y tailwindcss@latest init -p >/dev/null 2>&1; then
-      success=1
-      ok "tailwindcss init via npx (latest)."
+      success=1; ok "tailwindcss init via npx (latest)."
     fi
   fi
-
-  if [ "$success" -eq 0 ]; then
-    warn "Impossible de lancer 'tailwindcss init' — je poursuis (les fichiers seront écrits manuellement)."
-  fi
+  [ "$success" -eq 0 ] && warn "Impossible de lancer 'tailwindcss init' — je poursuis (les fichiers seront écrits manuellement)."
 else
   ok "tailwind.config.js déjà présent — skip init."
 fi
@@ -117,7 +119,6 @@ backup_if_exists() {
   fi
 }
 
-# tailwind.config.js (compatible v3/v4, optionnel en v4)
 backup_if_exists "tailwind.config.js"
 cat > tailwind.config.js <<'EOF'
 /** @type {import('tailwindcss').Config} */
@@ -129,7 +130,6 @@ export default {
 EOF
 ok "tailwind.config.js écrit."
 
-# postcss.config.js → plugin v4 requis: @tailwindcss/postcss
 backup_if_exists "postcss.config.js"
 cat > postcss.config.js <<'EOF'
 export default {
@@ -142,9 +142,6 @@ EOF
 ok "postcss.config.js écrit (plugin @tailwindcss/postcss)."
 
 # ──────────────── index.css (v4 style) ─────────────
-# En v4, on recommande un import unique :
-#   @import "tailwindcss";
-# On sauvegarde l'ancien et on écrit une version propre.
 CSS_FILE="src/index.css"
 mkdir -p src
 backup_if_exists "$CSS_FILE"
@@ -171,3 +168,5 @@ echo
 ok "Setup terminé."
 echo "▶ Lance le serveur : npm run dev"
 echo "   (Dossier : $PROJECT_DIR)"
+command -v git >/dev/null && [ ! -d .git ] && git init -q && git add . && git commit -m "chore: initial bootstrap" -q || true
+
