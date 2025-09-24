@@ -61,3 +61,15 @@ npm i -D vitest
 }
 ```
 
+---
+
+## 🗺️ Roadmap
+
+Ce starter évolue progressivement via des **packs optionnels** (branches dédiées, mergeables à la demande) :
+
+- **`feat/pwa`** : Progressive Web App (service worker, manifest, offline-first)
+- **`feat/boussole`** : Système de navigation/routing avancé avec état persistant
+- **`chore/quality-hooks`** : Git hooks (pre-commit, pre-push) + linting/formatting automatique
+
+> Chaque pack reste sur sa branche jusqu'à ce que tu décides de l'intégrer à `main` via PR.
+
