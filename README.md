@@ -1,7 +1,10 @@
-# 🌍 NSEO_starter
+# 🌍 Starter_NSEO
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Build](https://github.com/FleuryIO/Starter_NSEO/actions/workflows/ci.yml/badge.svg)](https://github.com/FleuryIO/Starter_NSEO/actions)
 
 Un **starter technique**, un **voyage intérieur**, et un **espace de disciplines d’excellence**.  
-Ce projet fournit une base solide pour NSEO : React + Vite + TailwindCSS, initialisé automatiquement via un script `bootstrap.sh`.
+Ce projet fournit une base solide pour NSEO : **React 19 + Vite 7 + TailwindCSS v4**, initialisé automatiquement via un script `bootstrap.sh`.
 
 ---
 
@@ -21,55 +24,3 @@ chmod +x bootstrap.sh
 ./bootstrap.sh "$HOME/Documents/Projets/NSEO_starter" \
   && cd "$HOME/Documents/Projets/NSEO_starter" \
   && npm run dev
-```
-
----
-
-## 🔍 Développement du script
-
-### Analyse statique avec shellcheck
-Avant de modifier `bootstrap.sh`, valide-le avec [shellcheck](https://www.shellcheck.net/) :
-
-```bash
-# macOS
-brew install shellcheck
-
-# Debian/Ubuntu
-sudo apt-get install -y shellcheck
-
-# Analyse
-shellcheck -x bootstrap.sh
-```
-
-### Scripts complémentaires (optionnels)
-Pour ajouter linting et tests à ton projet, installe les dépendances puis ajoute ces scripts à `package.json` :
-
-```bash
-# ESLint
-npm i -D eslint @eslint/js
-
-# Vitest
-npm i -D vitest
-```
-
-```json
-{
-  "scripts": {
-    "lint": "eslint .",
-    "test": "vitest"
-  }
-}
-```
-
----
-
-## 🗺️ Roadmap
-
-Ce starter évolue progressivement via des **packs optionnels** (branches dédiées, mergeables à la demande) :
-
-- **`feat/pwa`** : Progressive Web App (service worker, manifest, offline-first)
-- **`feat/boussole`** : Système de navigation/routing avancé avec état persistant
-- **`chore/quality-hooks`** : Git hooks (pre-commit, pre-push) + linting/formatting automatique
-
-> Chaque pack reste sur sa branche jusqu'à ce que tu décides de l'intégrer à `main` via PR.
-
